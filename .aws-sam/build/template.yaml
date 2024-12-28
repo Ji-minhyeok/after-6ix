@@ -2,8 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: 'after6ix-get-weather
 
-  Sample SAM Template for after6ix-get-weather
-
   '
 Globals:
   Function:
@@ -22,7 +20,8 @@ Resources:
       MemorySize: 512
       Environment:
         Variables:
-          PARAM1: VALUE
+          SERVICE_KEY:
+            Ref: SERVICE_KEY
       Events:
         HelloWorld:
           Type: Api
