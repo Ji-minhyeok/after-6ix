@@ -41,19 +41,16 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
     // 날씨 API 호출 메소드
     private String getWeatherData(String baseDate, String baseTime, String nx, String ny) {
         try {
-            System.out.println("Check point 1");
             String serviceKey = System.getenv("SERVICE_KEY");
-            System.out.println("SERVICE_KEY: " + serviceKey); // 추가 디버깅
-            System.out.println("Check point 2");
+
             if (serviceKey == null || serviceKey.isEmpty()) {
                 System.err.println("SERVICE_KEY is not set in environment variables.");
                 return null;
             }
-            System.out.println("Check point 4");
-            System.out.println("SERVICE_KEY: " + serviceKey); // 디버깅 code
+
             // API URL과 파라미터 설정
             StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst");
-            urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" +(serviceKey)); // 환경 변수에서 가져온 서비스 키
+            urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + URLEncoder.encode(serviceKey, "UTF-8")); // 환경 변수에서 가져온 서비스 키
             urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8"));
             urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8"));
             urlBuilder.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + URLEncoder.encode("JSON", "UTF-8"));
@@ -61,8 +58,6 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
             urlBuilder.append("&" + URLEncoder.encode("base_time", "UTF-8") + "=" + URLEncoder.encode(baseTime, "UTF-8"));
             urlBuilder.append("&" + URLEncoder.encode("nx", "UTF-8") + "=" + URLEncoder.encode(nx, "UTF-8"));
             urlBuilder.append("&" + URLEncoder.encode("ny", "UTF-8") + "=" + URLEncoder.encode(ny, "UTF-8"));
-
-            System.out.println("Final API URL: " + urlBuilder.toString());
 
             // API 호출
             URL url = new URL(urlBuilder.toString());
