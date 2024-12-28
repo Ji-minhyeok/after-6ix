@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  after6ix-get-weather
+
+  Sample SAM Template for after6ix-get-weather
+
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 512
+
+Resources:
+  After6ixGetWeatherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: after6ix-get-weather
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.App::handleRequest
+      Runtime: java17
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Environment:
+        Variables:
+          PARAM1: VALUE
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+
+Outputs:
+  After6ixGetWeatherApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  After6ixGetWeatherFunction:
+    Description: "After6ixGetWeather Lambda Function ARN"
+    Value: !GetAtt After6ixGetWeatherFunction.Arn
+  After6ixGetWeatherFunctionIamRole:
+    Description: "Implicit IAM Role created for After6ixGetWeather function"
+    Value: !GetAtt After6ixGetWeatherFunctionRole.Arn
