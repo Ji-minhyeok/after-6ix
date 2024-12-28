@@ -62,6 +62,8 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
             urlBuilder.append("&" + URLEncoder.encode("nx", "UTF-8") + "=" + URLEncoder.encode(nx, "UTF-8"));
             urlBuilder.append("&" + URLEncoder.encode("ny", "UTF-8") + "=" + URLEncoder.encode(ny, "UTF-8"));
 
+            System.out.println("Final API URL: " + urlBuilder.toString());
+
             // API 호출
             URL url = new URL(urlBuilder.toString());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
