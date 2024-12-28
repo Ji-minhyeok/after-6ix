@@ -53,7 +53,7 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
             System.out.println("SERVICE_KEY: " + serviceKey); // 디버깅 code
             // API URL과 파라미터 설정
             StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst");
-            urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + URLEncoder.encode(serviceKey, "UTF-8")); // 환경 변수에서 가져온 서비스 키
+            urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" +(serviceKey)); // 환경 변수에서 가져온 서비스 키
             urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8"));
             urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8"));
             urlBuilder.append("&" + URLEncoder.encode("dataType", "UTF-8") + "=" + URLEncoder.encode("JSON", "UTF-8"));
