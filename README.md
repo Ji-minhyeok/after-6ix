@@ -18,10 +18,10 @@
 - ✅**Java**를 기반으로 날씨 API 호출 및 데이터 반환
   - **기상청의 초단기예보 API** 연동
 
-- 🚧**정적 웹 페이지** 배포
-  - **S3** 배포 파일 업로드 (HTML, CSS, JavaScript 파일 업로드) (완료)
-  - **Geolocation API** 연동 -> 사용자의 위치 정보 가져오기 (진행중)
-  - **CloudFront** 배포 (완료)
+- ✅**정적 웹 페이지** 배포
+  - **S3** 배포 파일 업로드 (HTML, CSS, JavaScript 파일 업로드)
+  - **Geolocation API** 연동 -> 사용자의 위치 정보 가져오기
+  - **CloudFront** 배포
 
 ---
 
