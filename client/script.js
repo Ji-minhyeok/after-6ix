@@ -146,8 +146,8 @@ function displayWeatherData(weatherData) {
         // 하늘 상태와 강수 형태를 결합하여 현재 날씨 표시
         const currentWeather = getCurrentWeather(weatherItem);
 
-        // 강수량 표시, "강수없음"은 0으로 치환하고 mm 제거
-        const rainfall = weatherItem.RN1 === "강수없음" ? "0mm" : `${weatherItem.RN1}mm`;
+        // 강수량 표시, "강수없음"은 0으로 치환
+        const rainfall = weatherItem.RN1 === "강수없음" ? "0mm" : weatherItem.RN1;
 
         // 시각을 '11시'와 같이 간단하게 표현
         const formattedTime = formatTime(time);
