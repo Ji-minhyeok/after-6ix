@@ -1,8 +1,11 @@
-# After6ix
+<img src="https://after6ix-s3.s3.ap-northeast-2.amazonaws.com/after6ix_logo.jpg" alt="로고" width="500">
 
-현 위치를 기반으로 6시간 내의 초단기 기상예측을 제공하는 서비스입니다.
+현 위치를 기반으로 6시간 내의 상대적으로 정확도가 높은 초단기 기상예측을 제공하는 서비스입니다.
 
 (Java 기반 AWS Lambda 어플리케이션)
+
+## 배포 링크
+[![배포 링크](https://img.shields.io/badge/Deploy-Link-blue?style=for-the-badge)](https://d2uy0kreyqusu8.cloudfront.net/)
 
 ---
 
@@ -15,17 +18,12 @@
 - ✅**Java**를 기반으로 날씨 API 호출 및 데이터 반환
   - **기상청의 초단기예보 API** 연동
 
-- 🚧**정적 웹 페이지** 배포(진행중)
-  - **S3** 배포 파일 업로드 (HTML, CSS, JavaScript 파일 업로드)
-  - **Geolocation API** 연동 -> 사용자의 위치 정보 가져오기
-  - **CloudFront** 배포
----
-
-## ⏳ **진행 사항**
-
+- 🚧**정적 웹 페이지** 배포
+  - **S3** 배포 파일 업로드 (HTML, CSS, JavaScript 파일 업로드) (완료)
+  - **Geolocation API** 연동 -> 사용자의 위치 정보 가져오기 (진행중)
+  - **CloudFront** 배포 (완료)
 
 ---
-
 
 ## 🚀 **다음 계획**
 - **Route 53** 활용한 커스텀 도메인 적용
