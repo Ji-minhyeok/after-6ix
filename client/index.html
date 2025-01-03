@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <!-- CSS 파일을 CloudFront URL로 연결 -->
+    <link rel="stylesheet" href="https://after6ix-s3.s3.ap-northeast-2.amazonaws.com/style.css">
+</head>
+<body>
+<div class="container">
+    <!-- 이미지 파일도 S3 URL로 연결 -->
+    <img src="https://after6ix-s3.s3.ap-northeast-2.amazonaws.com/after6ix_logo.jpg" alt="Logo">
+    <h3>현 위치를 기반으로 6시간 내의 초단기 기상예측을 제공합니다.</h3>
+    <button id="fetchWeather">날씨 불러오기</button>
+    <div id="weatherResults" class="results">
+        <!-- 결과가 여기에 표시됩니다 -->
+    </div>
+</div>
+<!-- JS 파일을 CloudFront URL로 연결 -->
+<script src="https://after6ix-s3.s3.ap-northeast-2.amazonaws.com/script.js"></script>
+</body>
+</html>
