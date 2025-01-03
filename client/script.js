@@ -157,7 +157,7 @@ function displayWeatherData(weatherData) {
             <p>기온: ${weatherItem.T1H || 'N/A'}°C</p>
             <p>습도: ${weatherItem.REH || 'N/A'}%</p>
             <p>강수량: ${rainfall}</p>
-            <p>현재 날씨: ${currentWeather}</p>
+            <p>날씨: ${currentWeather}</p>
         `;
 
         weatherResults.appendChild(weatherDiv);
