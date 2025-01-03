@@ -1,6 +1,10 @@
 document.getElementById("fetchWeather").addEventListener("click", async () => {
     const weatherResults = document.getElementById("weatherResults");
+    const errorMessageContainer = document.getElementById("errorMessage"); // 오류 메시지 영역
+
     weatherResults.innerHTML = "날씨 정보를 불러오는 중...";
+
+    const defaultLocation = { latitude: 37.5665, longitude: 126.9780 }; // 서울 기본 좌표
 
     try {
         const currentTime = new Date();
@@ -20,12 +24,7 @@ document.getElementById("fetchWeather").addEventListener("click", async () => {
         const updatedBaseDate = currentTime.toISOString().slice(0, 10).replace(/-/g, '');
         baseTime = baseTime < 10 ? '0' + baseTime + '30' : baseTime + '30';
 
-        // 위치 정보를 얻고 그 안에서 API 호출
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const latitude = pos.coords.latitude;
-            const longitude = pos.coords.longitude;
-
-            // 위경도 -> 격자 좌표 변환
+        const fetchWeatherData = async (latitude, longitude) => {
             const gridCoords = convertToGrid(latitude, longitude);
             const grid_nx = gridCoords.nx;
             const grid_ny = gridCoords.ny;
@@ -39,10 +38,8 @@ document.getElementById("fetchWeather").addEventListener("click", async () => {
                 ny: grid_ny,
             };
 
-            // Lambda 함수의 엔드포인트
             const lambdaEndpoint = "https://jpdo02170i.execute-api.ap-northeast-2.amazonaws.com/after6ix-stage";
 
-            // Lambda 함수 호출
             const response = await fetch(
                 `${lambdaEndpoint}?base_date=${queryStringParameters.base_date}&base_time=${queryStringParameters.base_time}&nx=${queryStringParameters.nx}&ny=${queryStringParameters.ny}`
             );
@@ -52,13 +49,33 @@ document.getElementById("fetchWeather").addEventListener("click", async () => {
             }
 
             const weatherData = await response.json();
-            console.log(weatherData); // 데이터 구조 확인
+            console.log(weatherData);
             displayWeatherData(weatherData);
-        });
+        };
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const latitude = pos.coords.latitude;
+                const longitude = pos.coords.longitude;
+                // 위치 정보를 성공적으로 가져왔을 때, 오류 메시지 숨기기
+                errorMessageContainer.style.display = "none";
+                await fetchWeatherData(latitude, longitude);
+            },
+            async (error) => {
+                console.warn("위치 정보를 가져오는 데 실패하여 기본 위치로 대체합니다:", error);
+                // 위치 정보 실패 메시지 표시
+                errorMessageContainer.innerHTML = `<p class="error">위치 정보를 가져올 수 없어 기본 위치(서울) 기준으로 날씨를 표시합니다.</p>`;
+                errorMessageContainer.style.display = "block"; // 메시지 보이기
+                await fetchWeatherData(defaultLocation.latitude, defaultLocation.longitude);
+            }
+        );
     } catch (error) {
         weatherResults.innerHTML = `<p class="error">${error.message}</p>`;
     }
 });
+
+
+
 
 function convertToGrid(lat, lon) {
     // LCC DFS 좌표변환을 위한 기초 자료
