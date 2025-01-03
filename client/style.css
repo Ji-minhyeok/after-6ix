@@ -82,3 +82,9 @@ button:hover {
     transform: scale(0.95); /* 클릭 시 버튼 크기 약간 축소 */
     background-color: #005C3E; /* 클릭 시 색상 변경 */
 }
+#errorMessage {
+    color: red; /* 글자 색을 붉은색으로 설정 */
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 20px;
+}

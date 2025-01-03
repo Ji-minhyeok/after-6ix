@@ -1,59 +1,121 @@
 document.getElementById("fetchWeather").addEventListener("click", async () => {
     const weatherResults = document.getElementById("weatherResults");
+    const errorMessageContainer = document.getElementById("errorMessage"); // 오류 메시지 영역
+
     weatherResults.innerHTML = "날씨 정보를 불러오는 중...";
 
+    const defaultLocation = { latitude: 37.5665, longitude: 126.9780 }; // 서울 기본 좌표
+
     try {
-        // 요청 시각을 기반으로 base_date, base_time 생성
         const currentTime = new Date();
         const baseDate = currentTime.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
-    
+
         let baseTime = currentTime.getHours();
         let minutes = currentTime.getMinutes();
-    
-        // 45분 미만일 경우, 1시간 전의 데이터로 설정
+
         if (minutes < 45) {
-            baseTime = baseTime - 1; // 1시간 전 데이터
+            baseTime = baseTime - 1;
             if (baseTime < 0) {
-                baseTime = 23; // 0시 이전은 23시로 설정
-                // 날짜도 1일 전으로 설정
-                currentTime.setDate(currentTime.getDate() - 1); // 날짜 1일 전으로 변경
+                baseTime = 23;
+                currentTime.setDate(currentTime.getDate() - 1);
             }
         }
-    
-        // baseDate를 업데이트하여 날짜가 1일 전으로 변경된 경우 반영
-        const updatedBaseDate = currentTime.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
-    
-        // baseTime을 4자리로 맞추기 (시:30 형식으로 변환)
-        baseTime = baseTime < 10 ? '0' + baseTime + '30' : baseTime + '30'; // 4자리로 맞추기
-    
 
-        // 고정된 nx, ny
-        const queryStringParameters = {
-            base_date: baseDate,
-            base_time: baseTime,
-            nx: "55",
-            ny: "127",
+        const updatedBaseDate = currentTime.toISOString().slice(0, 10).replace(/-/g, '');
+        baseTime = baseTime < 10 ? '0' + baseTime + '30' : baseTime + '30';
+
+        const fetchWeatherData = async (latitude, longitude) => {
+            const gridCoords = convertToGrid(latitude, longitude);
+            const grid_nx = gridCoords.nx;
+            const grid_ny = gridCoords.ny;
+
+            console.log(`격자 좌표: nx=${grid_nx}, ny=${grid_ny}`);
+
+            const queryStringParameters = {
+                base_date: updatedBaseDate,
+                base_time: baseTime,
+                nx: grid_nx,
+                ny: grid_ny,
+            };
+
+            const lambdaEndpoint = "https://jpdo02170i.execute-api.ap-northeast-2.amazonaws.com/after6ix-stage";
+
+            const response = await fetch(
+                `${lambdaEndpoint}?base_date=${queryStringParameters.base_date}&base_time=${queryStringParameters.base_time}&nx=${queryStringParameters.nx}&ny=${queryStringParameters.ny}`
+            );
+
+            if (!response.ok) {
+                throw new Error("날씨 정보를 가져오는 데 실패했습니다.");
+            }
+
+            const weatherData = await response.json();
+            console.log(weatherData);
+            displayWeatherData(weatherData);
         };
 
-        // Lambda 함수의 엔드포인트
-        const lambdaEndpoint = "https://jpdo02170i.execute-api.ap-northeast-2.amazonaws.com/after6ix-stage";
-
-        // Lambda 함수 호출
-        const response = await fetch(
-            `${lambdaEndpoint}?base_date=${queryStringParameters.base_date}&base_time=${queryStringParameters.base_time}&nx=${queryStringParameters.nx}&ny=${queryStringParameters.ny}`
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const latitude = pos.coords.latitude;
+                const longitude = pos.coords.longitude;
+                // 위치 정보를 성공적으로 가져왔을 때, 오류 메시지 숨기기
+                errorMessageContainer.style.display = "none";
+                await fetchWeatherData(latitude, longitude);
+            },
+            async (error) => {
+                console.warn("위치 정보를 가져오는 데 실패하여 기본 위치로 대체합니다:", error);
+                // 위치 정보 실패 메시지 표시
+                errorMessageContainer.innerHTML = `<p class="error">위치 정보를 가져올 수 없어 기본 위치(서울) 기준으로 날씨를 표시합니다.</p>`;
+                errorMessageContainer.style.display = "block"; // 메시지 보이기
+                await fetchWeatherData(defaultLocation.latitude, defaultLocation.longitude);
+            }
         );
-
-        if (!response.ok) {
-            throw new Error("날씨 정보를 가져오는 데 실패했습니다.");
-        }
-
-        const weatherData = await response.json();
-        console.log(weatherData); // 데이터 구조 확인
-        displayWeatherData(weatherData);
     } catch (error) {
         weatherResults.innerHTML = `<p class="error">${error.message}</p>`;
     }
 });
+
+
+
+
+function convertToGrid(lat, lon) {
+    // LCC DFS 좌표변환을 위한 기초 자료
+    const RE = 6371.00877; // 지구 반경(km)
+    const GRID = 5.0; // 격자 간격(km)
+    const SLAT1 = 30.0; // 투영 위도1(degree)
+    const SLAT2 = 60.0; // 투영 위도2(degree)
+    const OLON = 126.0; // 기준점 경도(degree)
+    const OLAT = 38.0; // 기준점 위도(degree)
+    const XO = 43; // 기준점 X좌표(GRID)
+    const YO = 136; // 기준점 Y좌표(GRID)
+
+    const DEGRAD = Math.PI / 180.0;
+    const RADDEG = 180.0 / Math.PI;
+
+    const re = RE / GRID;
+    const slat1 = SLAT1 * DEGRAD;
+    const slat2 = SLAT2 * DEGRAD;
+    const olon = OLON * DEGRAD;
+    const olat = OLAT * DEGRAD;
+
+    let sn = Math.tan(Math.PI * 0.25 + slat2 * 0.5) / Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+    sn = Math.log(Math.cos(slat1) / Math.cos(slat2)) / Math.log(sn);
+    let sf = Math.tan(Math.PI * 0.25 + slat1 * 0.5);
+    sf = (Math.pow(sf, sn) * Math.cos(slat1)) / sn;
+    let ro = Math.tan(Math.PI * 0.25 + olat * 0.5);
+    ro = (re * sf) / Math.pow(ro, sn);
+
+    let ra = Math.tan(Math.PI * 0.25 + (lat) * DEGRAD * 0.5);
+    ra = (re * sf) / Math.pow(ra, sn);
+    let theta = lon * DEGRAD - olon;
+    if (theta > Math.PI) theta -= 2.0 * Math.PI;
+    if (theta < -Math.PI) theta += 2.0 * Math.PI;
+    theta *= sn;
+
+    const x = Math.floor(ra * Math.sin(theta) + XO + 0.5);
+    const y = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
+
+    return { nx: x, ny: y };
+}
 
 // 날씨 데이터를 화면에 표시하는 함수
 function displayWeatherData(weatherData) {
@@ -84,8 +146,8 @@ function displayWeatherData(weatherData) {
         // 하늘 상태와 강수 형태를 결합하여 현재 날씨 표시
         const currentWeather = getCurrentWeather(weatherItem);
 
-        // 강수량 표시, 강수없음일 경우 0mm로 설정
-        const rainfall = weatherItem.RN1 === "강수없음" || weatherItem.RN1 === "0" ? "0mm" : `${weatherItem.RN1}mm`;
+        // 강수량 표시, "강수없음"은 0으로 치환하고 mm 제거
+        const rainfall = weatherItem.RN1 === "강수없음" ? "0mm" : `${weatherItem.RN1}mm`;
 
         // 시각을 '11시'와 같이 간단하게 표현
         const formattedTime = formatTime(time);
