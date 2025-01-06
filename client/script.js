@@ -143,8 +143,12 @@ function displayWeatherData(weatherData) {
         const weatherDiv = document.createElement("div");
         weatherDiv.classList.add("weather-item");
 
+        // time을 기준으로 밤인지 확인
+        const isNight = parseInt(time, 10) >= 1900 || parseInt(time, 10) < 600; // 19시 이후 또는 6시 이전
+
+
         // 하늘 상태와 강수 형태를 결합하여 현재 날씨 표시
-        const currentWeather = getCurrentWeather(weatherItem);
+        const currentWeather = getCurrentWeather(weatherItem, isNight);
 
         // 강수량 표시, "강수없음"은 0으로 치환
         const rainfall = weatherItem.RN1 === "강수없음" ? "0mm" : weatherItem.RN1;
@@ -180,18 +184,19 @@ function groupWeatherData(items) {
 }
 
 // 현재 날씨 이모지 처리
-function getCurrentWeather(weatherItem) {
+function getCurrentWeather(weatherItem, isNight) {
     let sky = weatherItem.SKY;
     let pty = weatherItem.PTY;
 
-    let weatherIcon = "☀️"; // 기본 하늘 상태: 맑음 (구름 없는 해)
+    // 기본 하늘 상태: 맑음
+    let weatherIcon = isNight ? "🌙" : "☀️";
 
     // 하늘 상태 및 강수 형태를 결합
-    if (sky === "1" && pty === "1") {
+    if (pty === "1") {
         weatherIcon = "🌧️"; // 비
-    } else if (sky === "1" && pty === "2") {
+    } else if (pty === "2") {
         weatherIcon = "❄️🌧️"; // 눈/비
-    } else if (sky === "1" && pty === "3") {
+    } else if (pty === "3") {
         weatherIcon = "❄️"; // 눈
     } else if (sky === "3") {
         weatherIcon = "☁️"; // 구름 많음
