@@ -133,9 +133,15 @@ function displayWeatherData(weatherData) {
     // 시간대별로 데이터를 재조합
     const groupedData = groupWeatherData(filteredData);
 
-    // 시간별로 오름차순 정렬
-    const sortedTimes = Object.keys(groupedData).sort((a, b) => parseInt(a) - parseInt(b));
+    // 시간대별 오름차순 정렬
+    const sortedTimes = Object.keys(groupedData).sort((a, b) => {
+        // 각 항목에서 'fcstDate'와 'fcstTime'을 가져와 결합하여 비교
+        const timeA = parseInt(groupedData[a].fcstDate + groupedData[a].fcstTime, 10);
+        const timeB = parseInt(groupedData[b].fcstDate + groupedData[b].fcstTime, 10);
 
+        // 'YYYYMMDDHHMM' 형식으로 결합된 값을 기준으로 비교
+        return timeA - timeB;
+    });
     // 데이터를 출력
     weatherResults.innerHTML = "";
     sortedTimes.forEach(time => {
