@@ -180,8 +180,12 @@ function groupWeatherData(items) {
 
     items.forEach(item => {
         const time = item.fcstTime;
+        const date = item.fcstDate;
         if (!grouped[time]) {
-            grouped[time] = {};
+            grouped[time] = {
+                fcstDate: date,
+                fcstTime: time,
+            };
         }
         grouped[time][item.category] = item.fcstValue;
     });
