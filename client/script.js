@@ -7,22 +7,36 @@ document.getElementById("fetchWeather").addEventListener("click", async () => {
     const defaultLocation = { latitude: 37.5665, longitude: 126.9780 }; // 서울 기본 좌표
 
     try {
-        const currentTime = new Date();
-        const baseDate = currentTime.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
-
-        let baseTime = currentTime.getHours();
-        let minutes = currentTime.getMinutes();
-
-        if (minutes < 45) {
-            baseTime = baseTime - 1;
-            if (baseTime < 0) {
-                baseTime = 23;
-                currentTime.setDate(currentTime.getDate() - 1);
-            }
+        const now = new Date(); // 현재 시간
+        let baseTime = now.getHours(); // 현재 시각의 시간 부분
+        let baseDate = now.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD 형식의 날짜 (UTC기준)
+        
+        // UTC 기준으로 출력되는 baseDate를 KST 기준으로 변환
+        if (baseTime - 9 < 0) {
+            // baseTime - 9가 음수이므로 baseDate를 하루 더함함
+            const tomorrow = new Date(now); 
+            tomorrow.setDate(now.getDate() + 1);
+            baseDate = tomorrow.toISOString().slice(0, 10).replace(/-/g, ''); // KST 기준으로 baseDate 갱신
         }
 
-        const updatedBaseDate = currentTime.toISOString().slice(0, 10).replace(/-/g, '');
-        baseTime = baseTime < 10 ? '0' + baseTime + '30' : baseTime + '30';
+        // 45분보다 이전이면 한 시간 전의 데이터를 기준으로 요청
+        if (now.getMinutes() < 45) {
+            baseTime -= 1;
+        
+            if (baseTime < 0) {
+                baseTime = 23; // 한 시간 전이 자정일 경우
+                
+                // 날짜 계산을 위한 별도의 Date 객체 생성
+                const yesterday = new Date(now);
+                yesterday.setDate(now.getDate() - 1); // 하루 전으로 날짜 변경
+                baseDate = yesterday.toISOString().slice(0, 10).replace(/-/g, ''); // baseDate 갱신
+            }
+        
+        }
+        // baseTime을 4자리 형식으로 변환 (e.g., 0930, 2230)
+        baseTime = (baseTime < 10 ? '0' + baseTime : baseTime) + '30';
+        
+        
 
         const fetchWeatherData = async (latitude, longitude) => {
             const gridCoords = convertToGrid(latitude, longitude);
@@ -32,7 +46,7 @@ document.getElementById("fetchWeather").addEventListener("click", async () => {
             console.log(`격자 좌표: nx=${grid_nx}, ny=${grid_ny}`);
 
             const queryStringParameters = {
-                base_date: updatedBaseDate,
+                base_date: baseDate,
                 base_time: baseTime,
                 nx: grid_nx,
                 ny: grid_ny,
